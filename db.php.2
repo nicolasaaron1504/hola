@@ -1,12 +1,18 @@
 <?php
+// Configuración de la base de datos
 $host = "localhost";
-$user = "root"; // O el usuario que hayas configurado en MySQL
-$pass = "";     // Tu contraseña de MySQL
+$user = "admin";       // Verifica si tu usuario es 'root' o el que creaste
+$pass = "1234";           // ¡IMPORTANTE! Pon aquí la contraseña de tu MySQL
 $db   = "sistema_web";
 
+// Crear la conexión
 $conexion = mysqli_connect($host, $user, $pass, $db);
 
+// Verificar si la conexión falló
 if (!$conexion) {
-    die("Error de conexión: " . mysqli_connect_error());
+    die("Error crítico de conexión: " . mysqli_connect_error());
 }
+
+// Configurar el conjunto de caracteres a UTF-8 para evitar errores de símbolos
+mysqli_set_charset($conexion, "utf8");
 ?>
