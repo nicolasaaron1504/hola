@@ -1,5 +1,7 @@
 <?php
 include("db.php");
+// Iniciamos sesión para que el servidor recuerde quién entró
+session_start();
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $u = $_POST['usuario'] ?? '';
@@ -9,9 +11,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $resultado = mysqli_query($conexion, $sql);
 
     if ($fila = mysqli_fetch_assoc($resultado)) {
-        // Verificamos si la contraseña escrita coincide con la cifrada
         if (password_verify($p, $fila['password'])) {
-            echo "<h2 style='color:blue;'>BIENVENIDO, $u. Has iniciado sesión correctamente.</h2>";
+            // Guardamos el nombre del usuario en una "sesion"
+            $_SESSION['usuario_logueado'] = $u;
+            
+            // REDIRECCIÓN: Aquí ocurre la magia
+            header("Location: inicio.php");
+            exit(); // Es vital poner exit() para que el código se detenga aquí
         } else {
             echo "<b style='color:red;'>Contraseña incorrecta.</b>";
         }
@@ -21,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 ?>
 
-<form method="POST" style="font-family: sans-serif;">
+<form method="POST">
     <h2>Iniciar Sesión</h2>
     <input type="text" name="usuario" placeholder="Usuario" required><br><br>
     <input type="password" name="password" placeholder="Contraseña" required><br><br>
