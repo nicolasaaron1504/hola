@@ -1,0 +1,57 @@
+<?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+include("db.php");
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $n = $_POST['nombre'] ?? '';
+    $a = $_POST['apellidos'] ?? '';
+    $e = $_POST['email'] ?? '';
+    $u = $_POST['usuario'] ?? '';
+    $p = $_POST['password'] ?? '';
+
+    // 1. Validar campos vacíos
+    if (empty($n) || empty($a) || empty($e) || empty($u) || empty($p)) {
+        die("<b style='color:red;'>Error: Todos los campos son obligatorios.</b>");
+    }
+
+    // 2. Validar correo electrónico
+    if (!filter_var($e, FILTER_VALIDATE_EMAIL)) {
+        die("<b style='color:red;'>Error: El formato del correo no es válido.</b>");
+    }
+
+    // 3. Validar Contraseña (8 caracteres, Mayús, Minús y un guion)
+    $mayus = preg_match('/[A-Z]/', $p);
+    $minus = preg_match('/[a-z]/', $p);
+    $guion = strpos($p, '-') !== false;
+    $largo = strlen($p) >= 8;
+
+    if (!$mayus || !$minus || !$guion || !$largo) {
+        die("<b style='color:red;'>Error: La contraseña debe tener 8 caracteres, una Mayúscula, una minúscula y un guion (-).</b>");
+    }
+
+    // 4. Cifrar contraseña y guardar
+    $p_hash = password_hash($p, PASSWORD_DEFAULT);
+    $sql = "INSERT INTO usuarios (nombre, apellidos, email, usuario, password) VALUES ('$n', '$a', '$e', '$u', '$p_hash')";
+
+    if (mysqli_query($conexion, $sql)) {
+        echo "<h2 style='color:green;'>REGISTRO_EXITOSO</h2>";
+    } else {
+        if (mysqli_errno($conexion) == 1062) {
+            echo "<b style='color:red;'>Error: El nombre de usuario ya existe.</b>";
+        } else {
+            echo "Error de SQL: " . mysqli_error($conexion);
+        }
+    }
+}
+?>
+
+<form method="POST" style="font-family: sans-serif;">
+    <h2>Crear Cuenta</h2>
+    <input type="text" name="nombre" placeholder="Nombre" required><br><br>
+    <input type="text" name="apellidos" placeholder="Apellidos" required><br><br>
+    <input type="email" name="email" placeholder="Correo electrónico" required><br><br>
+    <input type="text" name="usuario" placeholder="Nombre de usuario" required><br><br>
+    <input type="password" name="password" placeholder="Contraseña (A, a, -, 8+)" required><br><br>
+    <button type="submit">Registrar Usuario</button>
+</form>
