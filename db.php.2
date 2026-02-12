@@ -1,0 +1,12 @@
+<?php
+$host = "localhost";
+$user = "root"; // O el usuario que hayas configurado en MySQL
+$pass = "";     // Tu contraseña de MySQL
+$db   = "sistema_web";
+
+$conexion = mysqli_connect($host, $user, $pass, $db);
+
+if (!$conexion) {
+    die("Error de conexión: " . mysqli_connect_error());
+}
+?>
